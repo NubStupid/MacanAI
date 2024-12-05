@@ -8,8 +8,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div id="arena" class="fixed top-52 left-96">
+<body class="w-[100ww] h-[100vh]">
+
+    <!-- Menu -->
+    <div class="flex justify-center z-50" id="menu">
+        <div class="p-32">
+            <div class="text-4xl text-blue-400 font-bold my-3">Macan AI</div>
+            <div class="flex justify-center my-3">
+                <button class="z-50 bg-blue-300 px-4 py-2 rounded-lg text-white" onclick="changePage('play')" id="playversus">Play Versus</button>
+            </div>
+            <!-- <div class="flex justify-center my-3">
+                <button class="bg-blue-300 px-4 py-2 rounded-lg text-white" onclick="changePage('play')">Play AI</button>
+            </div>
+            <div class="flex justify-center my-3">
+                <button class="bg-blue-300 px-4 py-2 rounded-lg text-white" onclick="changePage('play')">Play AI as Macan</button>
+            </div>
+            <div class="flex justify-center my-3">
+                <button class="bg-blue-300 px-4 py-2 rounded-lg text-white" onclick="changePage('play')">Play AI vs AI</button>
+            </div> -->
+        </div>
+    </div>
+
+
+    <!-- Arena -->
+    <div id="arena" class="fixed top-52 left-96 ">
         <svg width="882" height="700" class="absolute top-0 left-0 z-0">
             <line x1="1" y1="40" x2="1" y2="360" stroke="black" stroke-width="2" />
             <line x1="80" y1="111" x2="80" y2="289" stroke="black" stroke-width="2" />
@@ -37,52 +59,79 @@
             <line x1="580" y1="200" x2="760" y2="360" stroke="black" stroke-width="2" />
         </svg>
 
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[-30px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[-30px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[-30px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[50px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[50px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[50px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[150px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[150px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[150px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[150px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[150px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[250px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[250px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[250px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[250px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[250px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[350px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[350px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[350px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[350px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[350px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[450px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[450px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[450px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[450px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[450px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[550px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[550px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[550px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[550px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[550px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[650px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[650px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[650px]"></button>
-
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[730px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[730px]"></button>
-        <button class="absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[730px]"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[-30px]  playButton" ></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[-30px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[-30px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[50px]  playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[50px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[50px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[150px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[150px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[150px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[150px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[150px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[250px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[250px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[250px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[250px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[250px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[350px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[350px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[350px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[350px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[350px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[450px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[450px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[450px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[450px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[450px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[550px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[550px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[550px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[550px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[550px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[650px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[650px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[650px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[730px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[730px] playButton"></button>
+        <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[730px] playButton"></button>
     </div>
-</body>
+    <script>
+        // Variabel untuk mengatur view halaman
+        let page = "menu"
+        // const arena = document.getElementById("arena")
+        const menu = document.getElementById("menu")
+        const menuInputHandler = () => {
+            document.getElementById("playversus").disabled = !document.getElementById("playversus").disabled
+        }
 
+        const arenaInputHandler = () => {
+            let buttons = document.querySelectorAll(".playButton")
+            buttons.forEach(b => {
+                b.disabled = !b.disabled
+            });
+
+        }
+
+        const renderPage = (status) =>{
+            if(status == "menu"){
+                menu.style.opacity = 1
+                arena.style.opacity=0
+            }else{
+                menu.style.opacity =0
+                arena.style.opacity=1
+            }
+        }
+        renderPage(page)
+        arenaInputHandler()
+        const changePage = (setPage) => {
+            console.log("clicked");
+            page = setPage
+            menuInputHandler()
+            arenaInputHandler()
+            renderPage(page)
+        }
+    </script>
+</body>
 </html>
