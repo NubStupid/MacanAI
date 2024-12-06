@@ -31,6 +31,13 @@
 
 
     <!-- Arena -->
+     <div id="messageContainer" class="fixed bottom-0 w-[100vw] py-10">
+        <div class="flex justify-center">
+            <div class="bg-blue-300 p-5 rounded-lg" id="messageText">
+                
+            </div>
+        </div>
+     </div>
     <div id="arena" class="fixed top-52 left-96 ">
         <svg width="882" height="700" class="absolute top-0 left-0 z-0">
             <line x1="1" y1="40" x2="1" y2="360" stroke="black" stroke-width="2" />
@@ -98,22 +105,131 @@
         <button class="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[730px] playButton"></button>
     </div>
     <script>
+        // ========================= SETUP VARIABLE =====================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+
         // Variabel untuk mengatur view halaman
         let page = "menu"
-        // const arena = document.getElementById("arena")
+        const arena = document.getElementById("arena")
         const menu = document.getElementById("menu")
+        const messageContainer = document.getElementById("messageContainer")
+        const messageText = document.getElementById('messageText')
+
+        //variable semua button yang ada di arena
+        let arenaButtons = document.querySelectorAll(".playButton")
+
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+
+
+
+
+        // ========================= PLAY VARIABLE =====================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+
+
+        let gamePlayed = false;
+        let setupPhase = false;
+        let gamePhase = false;
+        // Variabel turn, boolean untuk 2 player. True = player 1, false = player 2
+        let turn = true;
+        let setupKambingCount = 9
+
+
+
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+        // ==============================================================================
+
+
+        const getMessageHTML = (title="",message="") => {
+            return `
+                <div class="text-2xl text-center text-white font-semibold ${title != ""?"pb-5":""}">${title}</div>
+                <div class="text-lg text-white font-normal text-center">${message}</div>
+            `
+        }
+
+        const showMessage = (title="",message="") => {
+            messageContainer.style.opacity = 1
+            messageText.innerHTML = getMessageHTML(title,message)
+        }
+
+        const hideMessage = () => {
+            messageContainer.style.opacity = 0
+            messageText.innerHTML = ""
+        }
+
+        hideMessage()
+
+
+
+        //toggle switch buat disable button menu
         const menuInputHandler = () => {
             document.getElementById("playversus").disabled = !document.getElementById("playversus").disabled
         }
 
+        // toggle switch buat disable button arena
         const arenaInputHandler = () => {
-            let buttons = document.querySelectorAll(".playButton")
-            buttons.forEach(b => {
+            arenaButtons.forEach(b => {
                 b.disabled = !b.disabled
             });
+        }
+
+        //Buat ngecek index dari seluruh button arena di dalam variabel arenaButtons
+        const renderKambingTest = () => {
+            arenaButtons.forEach((b,index)=>{
+                b.innerHTML = index
+            })
+        }
+
+
+        const setupKambing = () => {
 
         }
 
+
+        // Function untuk inti dari game playing
+        const startGame = () => {
+            while(gamePlayed){
+                if(turn){
+                    if(setupPhase == true){
+                        //Setup kambing
+                        setupKambing()
+                        showMessage("Player 1's Turn!",`You have to place ${setupKambingCount} more kambing!`)
+                    }
+                    // Switch turn
+                    turn = !turn 
+                }else{
+                    if(setupPhase == true){
+                        // Setup macan
+
+
+                        setupPhase = false
+                    }
+                    // Switch turn
+                    turn = !turn
+                }
+                gamePlayed = false
+            }
+        }
+
+
+
+
+        //Function buat nunjukin skrng viewing apa, menu atau arenanya
         const renderPage = (status) =>{
             if(status == "menu"){
                 menu.style.opacity = 1
@@ -121,10 +237,20 @@
             }else{
                 menu.style.opacity =0
                 arena.style.opacity=1
+                renderKambingTest()
+                gamePlayed = true;
+                setupPhase = true;
+                startGame()
             }
         }
+
+
         renderPage(page)
+        // Disable button arena karena setup awal
         arenaInputHandler()
+
+
+        //Function yang digunakan untuk switch mode playing dan mode menu
         const changePage = (setPage) => {
             console.log("clicked");
             page = setPage
@@ -132,6 +258,8 @@
             arenaInputHandler()
             renderPage(page)
         }
+        
+
     </script>
 </body>
 </html>
