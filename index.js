@@ -46,6 +46,9 @@ const neighbors = [
     [33, null, null, 35, null, null, null, null]
 ]
 
+// Variabel untuk menyimpan data player Uwong
+let uwongList = []
+
 // Variabel untuk mengatur view halaman
 
 let page = "menu"
@@ -184,16 +187,21 @@ const clickedButton = (index) => {
             b.classList.remove("bg-red-200");
             b.classList.add("bg-red-300");
             b.disabled = true;
+            uwongList.push(b.innerHTML)
         })
         turn += 1;
+        console.log(uwongList);
+        
     }
     // console.log(index.classList.includes("bg-red-200"));
 }
 
 //Buat ngecek index dari seluruh button arena di dalam variabel arenaButtons
+
 const renderUwongTest = () => {
     arenaButtons.forEach((b, index) => {
         b.innerHTML = index
+        
         b.addEventListener('mouseenter', () => {
             if(turn == 1 && ((index > 11 && index < 15) || (index > 16 && index < 20) || (index > 21 && index < 25)))
                 select9Uwong(index)
@@ -213,45 +221,72 @@ const renderUwongTest = () => {
 }
 
 
-const setupUwong = () => {
-
+const cleanUpUwong = () => {
+    arenaButtons.forEach((b)=>{
+        b.removeEventListener("mouseleave", () => {
+            select9Uwong(index, false);
+        })
+        b.removeEventListener("click", () => {
+            clickedButton(b);
+        })
+        b.removeEventListener("mouseenter", () => {
+            if(turn == 1 && ((index > 11 && index < 15) || (index > 16 && index < 20) || (index > 21 && index < 25)))
+                select9Uwong(index)
+            else if(turn == 1)
+                b.disabled = true;
+            else if(turn > 1 && !b.classList.contains("bg-green-300"))
+                b.disabled = false;
+        })
+    })
 }
 
 
 // Function untuk inti dari game playing
 const startGame = () => {
-    turn = 1
-    while (gamePlayed) {
+    setTimeout(()=>{
+        if (turn == 1) {
+            if (setupPhase == true) {
+                //Setup Uwong
+                showMessage("Player 1's Turn!", `You have to place ${setupUwongCount} more Uwong!`)
+                console.log("Player 1");
+                renderUwongTest()
+                
+            }else{
+                turn++
+            }
+            // Switch turn
+        } else {
+            if (setupPhase == true) {
+                // Setup macan
+                console.log("Macan");
+                cleanUpUwong()
+                hideMessage()
+                showMessage("Player 2's Turn!", "You have to eat 3 uwong first!")
+
+                
+
+                // setupPhase = false
+            }else{
+                turn++
+                
+            }
+            // Switch turn
+        }
+        // gamePlayed = false
+        if(gamePlayed == true){
+            startGame()
+        }
+    },200)
         
         // while(turn == 1)
         // {
-            // console.log(arenaButtons);
-            
-            // arenaButtonsfor.onmouseover((b) => {
-            //     console.log(b);
+        //     console.log(arenaButtons);
+        //     // arenaButtonsfor.onmouseover((b) => {
+        //     //     console.log(b);
                 
-            // })
+        //     // })
         // }
-        // if (turn) {
-        //     if (setupPhase == true) {
-        //         //Setup Uwong
-        //         setupUwong()
-        //         showMessage("Player 1's Turn!", `You have to place ${setupUwongCount} more Uwong!`)
-        //     }
-        //     // Switch turn
-        //     turn = !turn
-        // } else {
-        //     if (setupPhase == true) {
-        //         // Setup macan
-
-
-        //         setupPhase = false
-        //     }
-        //     // Switch turn
-        //     turn = !turn
-        // }
-        gamePlayed = false
-    }
+        
 }
 
 
@@ -265,9 +300,10 @@ const renderPage = (status) => {
     } else {
         menu.style.opacity = 0
         arena.style.opacity = 1
-        renderUwongTest()
+        
         gamePlayed = true;
         setupPhase = true;
+        turn = 1
         startGame()
     }
 }
