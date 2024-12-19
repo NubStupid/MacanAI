@@ -176,25 +176,25 @@ const select9Uwong = (index, hover = true) => {
     }
 }
 
-const clickedButton = (index) => {
-    console.log(index);
-    console.log();
-    if(index.classList.contains("bg-red-200"))
-    {
-        let selectedButtons = document.querySelectorAll(".bg-red-200");
-        // console.log(selectedButtons);
-        selectedButtons.forEach((b) => {
-            b.classList.remove("bg-red-200");
-            b.classList.add("bg-red-300");
-            b.disabled = true;
-            uwongList.push(b.innerHTML)
-        })
-        turn += 1;
-        console.log(uwongList);
+// const clickedButton = (index) => {
+//     console.log(index);
+//     console.log();
+//     if(index.classList.contains("bg-red-200"))
+//     {
+//         let selectedButtons = document.querySelectorAll(".bg-red-200");
+//         // console.log(selectedButtons);
+//         selectedButtons.forEach((b) => {
+//             b.classList.remove("bg-red-200");
+//             b.classList.add("bg-red-300");
+//             b.disabled = true;
+//             uwongList.push(b.innerHTML)
+//         })
+//         turn += 1;
+//         console.log(uwongList);
         
-    }
-    // console.log(index.classList.includes("bg-red-200"));
-}
+//     }
+//     // console.log(index.classList.includes("bg-red-200"));
+// }
 
 //Buat ngecek index dari seluruh button arena di dalam variabel arenaButtons
 
@@ -242,83 +242,83 @@ const cleanUpUwong = () => {
 
 
 // Function untuk inti dari game playing
-const startGame = () => {
-    setTimeout(()=>{
-        if (turn == 1) {
-            if (setupPhase == true) {
-                //Setup Uwong
-                showMessage("Player 1's Turn!", `You have to place ${setupUwongCount} more Uwong!`)
-                console.log("Player 1");
-                renderUwongTest()
+// const startGame = () => {
+//     setTimeout(()=>{
+//         if (turn == 1) {
+//             if (setupPhase == true) {
+//                 //Setup Uwong
+//                 showMessage("Player 1's Turn!", `You have to place ${setupUwongCount} more Uwong!`)
+//                 console.log("Player 1");
+//                 renderUwongTest()
                 
-            }else{
-                turn++
-            }
-            // Switch turn
-        } else {
-            if (setupPhase == true) {
-                // Setup macan
-                console.log("Macan");
-                cleanUpUwong()
-                hideMessage()
-                showMessage("Player 2's Turn!", "You have to eat 3 uwong first!")
+//             }else{
+//                 turn++
+//             }
+//             // Switch turn
+//         } else {
+//             if (setupPhase == true) {
+//                 // Setup macan
+//                 console.log("Macan");
+//                 cleanUpUwong()
+//                 hideMessage()
+//                 showMessage("Player 2's Turn!", "You have to eat 3 uwong first!")
 
                 
 
-                // setupPhase = false
-            }else{
-                turn++
+//                 // setupPhase = false
+//             }else{
+//                 turn++
                 
-            }
-            // Switch turn
-        }
-        // gamePlayed = false
-        if(gamePlayed == true){
-            startGame()
-        }
-    },200)
+//             }
+//             // Switch turn
+//         }
+//         // gamePlayed = false
+//         if(gamePlayed == true){
+//             startGame()
+//         }
+//     },200)
         
-        // while(turn == 1)
-        // {
-        //     console.log(arenaButtons);
-        //     // arenaButtonsfor.onmouseover((b) => {
-        //     //     console.log(b);
+//         // while(turn == 1)
+//         // {
+//         //     console.log(arenaButtons);
+//         //     // arenaButtonsfor.onmouseover((b) => {
+//         //     //     console.log(b);
                 
-        //     // })
-        // }
+//         //     // })
+//         // }
         
-}
+// }
 
 
 
 
 //Function buat nunjukin skrng viewing apa, menu atau arenanya
-const renderPage = (status) => {
-    if (status == "menu") {
-        menu.style.opacity = 1
-        arena.style.opacity = 0
-    } else {
-        menu.style.opacity = 0
-        arena.style.opacity = 1
+// const renderPage = (status) => {
+//     if (status == "menu") {
+//         menu.style.opacity = 1
+//         arena.style.opacity = 0
+//     } else {
+//         menu.style.opacity = 0
+//         arena.style.opacity = 1
         
-        gamePlayed = true;
-        setupPhase = true;
-        turn = 1
-        startGame()
-    }
-}
+//         gamePlayed = true;
+//         setupPhase = true;
+//         turn = 1
+//         startGame()
+//     }
+// }
 
 
-renderPage(page)
+// renderPage(page)
 // Disable button arena karena setup awal
-arenaInputHandler()
+// arenaInputHandler()
 
 
 //Function yang digunakan untuk switch mode playing dan mode menu
-const changePage = (setPage) => {
-    console.log("clicked");
-    page = setPage
-    menuInputHandler()
-    arenaInputHandler()
-    renderPage(page)
-}
+// const changePage = (setPage) => {
+//     console.log("clicked");
+//     page = setPage
+//     menuInputHandler()
+//     arenaInputHandler()
+//     renderPage(page)
+// }

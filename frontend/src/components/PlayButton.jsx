@@ -3,7 +3,7 @@ function PlayButton()
     return(
         <>
             <button id="btn0"
-            className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[-30px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[-30px] playButton"></button>
             <button id="btn1"
                 className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[-30px] playButton"></button>
             <button id="btn2"
