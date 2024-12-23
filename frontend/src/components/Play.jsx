@@ -8,21 +8,12 @@ function Play()
     const [unplacedUwong, setUnplacedUwong] = useState(21);
     const [message, setMessage] = useState("");
 
-    // let uwong = "";
-
     useEffect(() => {
         if(turn % 2)
             setMessage("Player 1's Turn!");
         else
             setMessage("Player 2's Turn!");
     }, [turn])
-
-    // useEffect(() => {
-    //     uwong = "";
-    //     for (let i = 0; i < unplacedUwong; i++) {
-    //         uwong += ""
-    //     }
-    // }, [unplacedUwong])
 
     return(
         <>
