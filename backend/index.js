@@ -53,30 +53,72 @@ const getAvailablePositionFromArray = (index) => {
     return allAvailablePosition
 }
 
-const setupUwong = (positions)=>{
-    if(Array.isArray(positions)){
-        if(positions.length == 9){
-            for (let i = 0; i < positions.length; i++) {
-                uwongList.push(positions[i])
-            }
+const getAvailableAreaForMacan = (macan,uwongList,area,index) => {
+    console.log(area,index);
+    if(area.length == 0){   
+        const availablePositions = getAvailablePositionFromArray(macan)
+        if(availablePositions.length == 0){
+            return []
         }else{
-            throw new Error(`Positions length in setup isn't valid with the regulation (9), actual posisitons length: ${positions.length}`)
+            return getAvailableAreaForMacan(macan,uwongList,availablePositions,0)
         }
     }else{
-        throw new Error("Positions in setup Uwong is not a valid data tpye")
+        let availablePositions = []
+        if(index != area.length){
+            availablePositions = getAvailablePositionFromArray(area[index])
+        }
+        console.log(area,index,area.length,availablePositions.length);
+        if(availablePositions.length != 0){
+            availablePositions.map((p)=>{
+                if(!area.includes(p) && !uwongList.includes(p)){
+                    area.push(p)
+                }
+            })
+        }else{
+            if(index == area.length){
+                return area
+            }
+        }
+        return getAvailableAreaForMacan(macan,uwongList,area,index+1)
     }
 }
 
-const setupMacan = (position) => {
-    let macan = position
+const getAllPossibleMakan = (macan,uwongList) => {
+    const possibleMakan = neighbors[macan]
+    let canMakan = []
+    possibleMakan.forEach((p,index) => {
+        let uwongCount =0
+        let traverse = p
+        while(traverse != null && uwongList.includes(traverse)){
+            uwongCount++
+            traverse = neighbors[traverse][index]
+        }
+        if(uwongCount % 2 == 1){
+            canMakan.push(p)
+        }
+    });
+    return canMakan
 }
-
 
 
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+app.get('/makan',(req,res)=>{
+    let dummList = [0,3,4,5,13,18,23,6,7]
+    let dummMacan = 8
+    const getMakan = getAllPossibleMakan(dummMacan,dummList)
+    return res.status(200).json({makan:getMakan})
+})
+
+app.get('/area',(req,res)=>{
+    let dummList = [7,13,9,12,14]
+    let dummMacan = 0
+    const area = getAvailableAreaForMacan(dummMacan,dummList,[],0)
+    return res.status(200).json({area:area})
+})
 
 app.get("/test", async (req, res) => {
     let neighbour = getAvailablePositionFromArray(1)
