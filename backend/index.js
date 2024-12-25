@@ -94,13 +94,57 @@ const getAllPossibleMakan = (macan,uwongList) => {
             traverse = neighbors[traverse][index]
         }
         if(uwongCount % 2 == 1){
-            canMakan.push(p)
+            canMakan.push({
+                index:p,
+                total:uwongCount
+            })
         }
     });
     return canMakan
 }
 
+const getBestAncam = (position,uwongList) => {
+    const canAncam = getAllPossibleMakan(position,uwongList)
+    if(canAncam.length != 0){
+        let max = 0
+        canAncam.map((c)=> {
+            if(c.total > max) max = c.total
+        })
+        return max
+    }else{
+        return 0
+    }
+}
 
+const howSafeToPlaceUwong = (position,uwongList,macan) => {
+    const terancam = neighbors[position].includes(macan)
+    if(terancam == true){
+        return -1
+    } else{
+        const neigbour = neighbors[position]
+        let maxSafeUnit =0
+        neigbour.forEach((n,index)=>{
+            let traverse = n
+            let safeUnit =0
+            while(traverse != null && uwongList.includes(traverse)){
+                safeUnit++
+                traverse = neighbors[traverse][index]
+            }
+            if(safeUnit > maxSafeUnit) maxSafeUnit = safeUnit
+        })
+        return maxSafeUnit
+    }
+}
+
+const calculateUnitSBE = (position,role) => {
+    if(role == 1){
+        // uwong
+        
+    }else{
+        // macan
+
+    }
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
