@@ -117,7 +117,7 @@ const getBestAncam = (position,uwongList) => {
 const howSafeToPlaceUwong = (position,uwongList,macan) => {
     const terancam = neighbors[position].includes(macan)
     if(terancam == true){
-        return -1
+        return -50
     } else{
         const neigbour = neighbors[position]
         let maxSafeUnit =0
@@ -134,14 +134,152 @@ const howSafeToPlaceUwong = (position,uwongList,macan) => {
     }
 }
 
-const calculateUnitSBE = (position,role,macan,uwongList) => {
+// Memakan uwong yang tetangganya banyak 
+const bestSetupPhaseMacanEatUwong = (uwongList) =>{
+    let maxUwongConnected = 0
+    let uwongToEat = -1
+    uwongList.forEach((u)=>{
+        let neighboringUwong = 0
+        neighbors[u].forEach((n)=>{
+            if(uwongList.includes(n))
+                neighboringUwong++
+        })
+        if(maxUwongConnected < neighboringUwong){
+            maxUwongConnected = neighboringUwong
+            uwongToEat = u
+        }
+    })
+    return uwongToEat
+}
+
+// Masang uwong yang tempatnya lebih tertutup
+/**
+ * @param {Array<number>} possibleUwongList - Array of uwong that "could" be placed for the setup phase
+ * @return {number} The total area of uwong's possible threat. The greater the returns means the placement is more open
+ */
+const bestSetup9UwongPlaced = (possibleUwongList) => {
+    let totalOpenArea = 0
+    let topLeftUwong = possibleUwongList.reduce((acc,n)=>{
+        if(acc > n){
+            console.log(n);
+            return n
+        }else{
+            return acc
+        }
+    },100)
+    let bottomRightUwong = possibleUwongList.reduce((acc,n)=>{
+        if(acc < n){
+            return n
+        }else{
+            return acc
+        }
+    },0)
+    console.log(topLeftUwong,bottomRightUwong);
+    
+    let traverse
+    // left
+    traverse = topLeftUwong
+    while(traverse != null && traverse != 8){
+        traverse = neighbors[traverse][1]
+        if(traverse != null)totalOpenArea++
+    }
+    // top
+    traverse = topLeftUwong
+    while(traverse != null){
+        traverse = neighbors[traverse][3]
+        if(traverse != null)totalOpenArea++
+    }
+    // right
+    traverse = bottomRightUwong
+    while(traverse != null && traverse != 28){
+        traverse = neighbors[traverse][6]
+        if(traverse != null)totalOpenArea++
+    }
+    // bottom
+    traverse = bottomRightUwong
+    while(traverse != null){
+        traverse = neighbors[traverse][4]
+        if(traverse != null)totalOpenArea++
+    }
+
+    return totalOpenArea
+}
+
+/** 
+* Calculate SBE Unit
+* @param {Array<Number>} positions - The index of the moves to make, Array when not in setup phase
+* @param {Number} role - Roles of the moves that needs to be evaluated (0 for macan, 1 for uwong)
+* @param {Number} macan - Index of macan
+* @param {Array<Number>} uwongList - List of all uwong in the board
+* @param {boolean} setup - Descripting the phase of the game, if it's in setup phase, set the parameter to True
+* @return {number} The value of SBE Evaluation for a specific moves
+*/
+
+function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
+
+    // Default unit = 0
+    let SBEunit = 0
+    let winCondition = ""
+    // Specified Roles Evaluation
     if(role == 1){
         // uwong
-        
+        if(setup == true){
+            // fase pasang 9 uwong, positions jadi penentu pasang uwongList
+            SBEunit -= bestSetup9UwongPlaced(positions)
+        }else{
+            // uwongList harus dikurangi p klo misal array
+            // positions.forEach((p,index)=>{
+            //     howSafeToPlaceUwong(p,uwongList,macan)
+            // })
+        }
     }else{
         // macan
+        if(setup == true){  
+            // fase makan 3 uwong, pastikan bukan array
+            if(positions == bestSetupPhaseMacanEatUwong(uwongList)){
+                SBEunit -= 20
+            }else{
+                SBEunit -= 10
+            }
+        }else{
+            // Kalau array
+            // const canMakan = getAllPossibleMakan(macan,uwongList)
+            // const bestMakan = canMakan.reduce((acc,m)=>{
+            //     if(positions.includes(m.index)){
+            //         if(m.total > 0){
+            //             return m.total
+            //         }
+            //     }else{
+            //         return acc
+            //     }
+            // },0)
+            // SBEunit -= bestMakan*100
+            // const allPossibleAncam = positions.map((p)=> neighbors[p])
+            // const bestAncam = allPossibleAncam.reduce((acc,a)=>{
+            //     const totalAncam = getBestAncam(a)
+            //     if(totalAncam > acc){
+            //         return totalAncam
+            //     }else{
+            //         return acc
+            //     }
+            // },0)
 
+        }
     }
+
+    // General Evaluation
+    if(macan != null && uwongList!= null)
+    SBEunit -= (getAvailableAreaForMacan(macan,uwongList,[],0).length*-5)
+
+    // Win Condition
+    if(winCondition == "macan"){
+        SBEunit -= 100000
+    }else if(winCondition == "uwong"){
+        SBEunit += 100000
+    }
+
+    return SBEunit
+
 }
 
 const minimax = (ply, action, role, macan, uwongList, unplacedUwong) => {
@@ -223,6 +361,13 @@ const uwongPossiblePlaced = (macan, uwongList) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+app.get("/api/uwong/setup",(req,res) => {
+    let dummUwongList = [6,7,8,11,12,13,16,17,18]
+    let totalArea = bestSetup9UwongPlaced(dummUwongList)
+    return res.json({totalArea:totalArea})
+
+})
 
 app.get('/makan',(req,res)=>{
     let dummList = [0,3,4,5,13,18,23,6,7]
