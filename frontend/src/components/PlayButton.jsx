@@ -1,3 +1,6 @@
+import { useRef } from "react";
+import client from "../client";
+
 function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
 {
     const neighbors = [
@@ -40,7 +43,33 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         [33, null, null, 35, null, null, null, null]
     ]
 
+    const macan = useRef(-1);
+    const uwong = useRef([]);
     let arenaButtons = document.querySelectorAll(".playButton")
+
+    const renderButton = () => {
+        arenaButtons.forEach(b => {
+            b.classList.remove("border-black");
+            b.classList.remove("border-2");
+            b.classList.remove("bg-blue-300");
+            b.classList.remove("bg-blue-200");
+            b.classList.remove("bg-blue-100");
+            b.classList.remove("bg-red-300");
+            b.classList.remove("bg-red-200");
+            b.classList.remove("bg-red-100");
+            b.classList.add("bg-green-300");
+            b.disabled = true;
+        });
+        if(macan.current != -1)
+        {
+            arenaButtons[macan.current].classList.remove("bg-green-300");
+            arenaButtons[macan.current].classList.add("bg-red-300");
+        }
+        uwong.current.forEach(u => {
+            arenaButtons[u].classList.remove("bg-green-300");
+            arenaButtons[u].classList.add("bg-blue-300")
+        });
+    }
 
     const select9Uwong = (btn, hover = true) => {
         let index = btn.id.substring(3);
@@ -93,76 +122,39 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
 
     const gameOver = () => {
         arenaButtons.forEach((b) => {
+            b.classList.remove("border-black");
+            b.classList.remove("border-2");
             b.classList.remove("bg-green-300");
             b.classList.remove("bg-blue-300");
+            b.classList.remove("bg-blue-200");
+            b.classList.remove("bg-blue-100");
             b.classList.remove("bg-red-300");
+            b.classList.remove("bg-red-200");
+            b.classList.remove("bg-red-100");
         })
     }
 
-    const possibleMoves = (btn, now = "macan") => {
+    const possibleMoves = async (btn, now = "macan") => {
         if(now == "macan")
         {
-            let macan, over = true;
-            document.querySelectorAll(".bg-red-300").forEach((m) => {
-                if(m.className.includes("playButton"))
-                    macan = m;
-            });
-            macan.classList.add("border-black");
-            macan.classList.add("border-2");
-            document.querySelectorAll(".playButton").forEach((b) => b.disabled = true)
-            neighbors[macan.id.substring(3)].forEach((n, idx) => {
-                if(arenaButtons[n] && arenaButtons[n].className.includes("bg-green-300"))
-                {
-                    arenaButtons[n].classList.add("bg-red-100");
-                    arenaButtons[n].disabled = false;
-                    over = false;
-                }
-                else if(arenaButtons[n] && arenaButtons[n].className.includes("bg-blue-300"))
-                {
-                    let count = 1, next = neighbors[macan.id.substring(3)][idx];
-                    while(true)
-                    {
-                        console.log(arenaButtons[neighbors[next][idx]]);
-                        
-                        if(neighbors[next][idx] && arenaButtons[neighbors[next][idx]].className.includes("bg-blue-300"))
-                            next = neighbors[next][idx]
-                        else
-                        {
-                            if(neighbors[next][idx])
-                                next = neighbors[next][idx]
-                            else
-                                count = 0;
-                            break;
-                        }
-                        count++;
-                    }
-                    if(count % 2)
-                    {
-                        arenaButtons[next].classList.add("bg-red-100");
-                        arenaButtons[next].disabled = false;
-                        over = false;
-                    }
-                }
+            let moves = await client.post(`/macan/moves`, {macan: macan.current, uwong: uwong.current});
+            arenaButtons[macan.current].classList.add("border-black");
+            arenaButtons[macan.current].classList.add("border-2");
+            moves.data.moves.forEach((m) => {
+                arenaButtons[m].classList.add("bg-red-100");
+                arenaButtons[m].disabled = false;
             })
-            if(over)
+            if(moves.data.moves.length == 0)
                 gameOver();
         }
         else
         {
-            document.querySelectorAll(".bg-blue-100").forEach((b) => {
-                b.classList.remove("bg-blue-100");
-                b.classList.add("bg-green-300");
-            });
             btn.classList.add("border-black");
             btn.classList.add("border-2");
-            document.querySelectorAll(".playButton").forEach((b) => b.disabled = true)
-            neighbors[btn.id.substring(3)].forEach((n) => {
-                if(arenaButtons[n] && arenaButtons[n].className.includes("bg-green-300"))
-                {
-                    arenaButtons[n].classList.remove("bg-green-300");
-                    arenaButtons[n].classList.add("bg-blue-100");
-                    arenaButtons[n].disabled = false;
-                }
+            let moves = await client.post(`/uwong/moves`, {macan: macan.current, uwong: uwong.current, index: parseInt(btn.id.substring(3))});
+            moves.data.moves.forEach((m) => {
+                arenaButtons[m].classList.add("bg-blue-100");
+                arenaButtons[m].disabled = false;
             })
         }
     }
@@ -171,31 +163,22 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         if(!now)
             return false;
         else if(arenaButtons[now].className.includes("bg-red-200"))
-        {
-            arenaButtons[now].classList.remove("bg-red-200");
             return true;
-        }
-
         if(eatUwong(neighbors[now][idx], idx) == true)
         {
-            arenaButtons[now].classList.remove("bg-blue-300");
-            arenaButtons[now].classList.add("bg-green-300");
+            uwong.current = uwong.current.filter(u => u != now);
             return true;
         }
         return false;
     }
 
     const click = (btn) => {
-        
+        let index = parseInt(btn.id.substring(3));
         if(turn == 1)
         {
             let selectedButtons = document.querySelectorAll(".bg-blue-200");
-            selectedButtons.forEach((b) => {
-                b.classList.remove("bg-green-300");
-                b.classList.remove("bg-blue-200");
-                b.classList.add("bg-blue-300");
-                b.disabled = false;
-            })
+            selectedButtons.forEach((b) => uwong.current.push(parseInt(b.id.substring(3))))
+            renderButton();
             setUnplacedUwong(unplacedUwong - 9);
             setTurn(i => i + 1);
         }
@@ -203,9 +186,8 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         {
             if(btn.className.includes("bg-red-200"))
             {   
-                btn.classList.remove("bg-green-300");
-                btn.classList.remove("bg-red-200");
-                btn.classList.add("bg-red-300");
+                macan.current = parseInt(btn.id.substring(3));
+                renderButton();
                 setTurn(i => i + 1);
             }
         }
@@ -213,50 +195,30 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         {
             if(unplacedUwong > 0)
             {
-                btn.classList.remove("bg-green-300");
-                btn.classList.remove("bg-blue-200");
-                btn.classList.add("bg-blue-300");
+                uwong.current.push(parseInt(btn.id.substring(3)));
+                renderButton();
                 setUnplacedUwong(unplacedUwong - 1);
                 setTurn(turn + 1);
                 possibleMoves(btn);
             }
-            else if(btn.className.includes("bg-blue-300"))
+            else if(uwong.current.includes(index))
             {
-                document.querySelectorAll(".border-black").forEach((b) => {
-                    b.classList.remove("border-black");
-                    b.classList.remove("border-2");
-                });
-                btn.classList.add("border-black");
-                btn.classList.add("border-2");
+                renderButton();
                 possibleMoves(btn, "uwong")
             }
             else
             {
-                document.querySelectorAll(".border-black").forEach((b) => {
-                    b.classList.remove("border-black");
-                    b.classList.remove("border-2");
-                    b.classList.remove("bg-blue-300");
-                    b.classList.add("bg-green-300");
-                });
-                document.querySelectorAll(".bg-blue-100").forEach((b) => {
-                    b.classList.remove("bg-blue-100");
-                    b.classList.add("bg-green-300");
-                });
-                btn.classList.remove("bg-green-300");
-                btn.classList.remove("bg-blue-200");
-                btn.classList.add("bg-blue-300");
+                document.querySelectorAll(".border-black").forEach((b) => uwong.current = uwong.current.filter(u => u != parseInt(b.id.substring(3))));
+                uwong.current.push(parseInt(btn.id.substring(3)));
+                renderButton();
                 setTurn(turn + 1);
                 possibleMoves(btn);
             }
         }
         else if(turn % 2 == 0)
         {
-            let macan, ketemu = false, count = 0;
-            document.querySelectorAll(".bg-red-300").forEach((m) => {
-                if(m.className.includes("playButton") && m.className.includes("border-black"))
-                    macan = m;
-            });
-            neighbors[macan.id.substring(3)].forEach((n, idx) => {
+            let ketemu = false;
+            neighbors[macan.current].forEach((n, idx) => {
                 if(ketemu)
                     return;
                 if(arenaButtons[n] == btn)
@@ -264,39 +226,30 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
                 else if(arenaButtons[n] && arenaButtons[n].className.includes("bg-blue-300"))
                     eatUwong(n, idx);
             })
-            btn.classList.remove("bg-red-200");
-            btn.classList.remove("bg-green-300");
-            btn.classList.add("bg-red-300");
-            macan.classList.remove("bg-red-300");
-            macan.classList.remove("border-2");
-            macan.classList.add("bg-green-300");
-            document.querySelectorAll(".bg-red-100").forEach((b) => b.classList.remove("bg-red-100"));
-            document.querySelectorAll(".bg-blue-300").forEach((m) => {
-                if(m.className.includes("playButton"))
-                    count++;
-            });
-            if(count + unplacedUwong < 14)
+            macan.current = parseInt(btn.id.substring(3));
+            if(uwong.current.length + unplacedUwong < 14)
             {
                 gameOver();
                 return;
             }
+            renderButton();
             setTurn(turn + 1);
         }
     }
 
-
     const hover = (btn) => {
-        let index = btn.id.substring(3);
+        let index = parseInt(btn.id.substring(3));
         if(turn == 1 && ((index > 11 && index < 15) || (index > 16 && index < 20) || (index > 21 && index < 25)))
             select9Uwong(btn)
         else if(turn == 1)
             btn.disabled = true;
         else if(turn == 2)
         {
-            if(!btn.className.includes("bg-blue-300"))
+            if(!uwong.current.includes(index))
+            {
                 btn.classList.add("bg-red-200");
-            else
-                btn.disabled = true;
+                btn.disabled = false;
+            }
         }
         else if(turn % 2)
         {
@@ -352,7 +305,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
             if(btn.className.includes("bg-blue-200"))
             {
                 btn.classList.remove("bg-blue-200");
-                if(!btn.className.includes("bg-blue-300") && !btn.className.includes("bg-green-300"))
+                if(unplacedUwong == 0 && !btn.className.includes("bg-blue-300"))
                     btn.classList.add("bg-blue-100");
             }
         }

@@ -2,8 +2,6 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
-let uwongList = []
-let macan
 const neighbors = [
     [null, null, null, null, 1, null, null, 3],
     [null, null, null, 0, 2, null, 4, null],
@@ -136,7 +134,7 @@ const howSafeToPlaceUwong = (position,uwongList,macan) => {
     }
 }
 
-const calculateUnitSBE = (position,role) => {
+const calculateUnitSBE = (position,role,macan,uwongList) => {
     if(role == 1){
         // uwong
         
@@ -144,6 +142,82 @@ const calculateUnitSBE = (position,role) => {
         // macan
 
     }
+}
+
+const minimax = (ply, action, role, macan, uwongList, unplacedUwong) => {
+    // role true = uwong, false = macan
+    // action false = min, true = max
+    if(ply == 0)
+    {
+        if(role)
+        {
+            uwongList.forEach((u, idx) => {
+                calculateUnitSBE(uwongPossibleMoves(macan, uwongList, idx), role, macan, uwongList)
+            });
+        }
+        else
+            calculateUnitSBE(macanPossibleMoves(macan, uwongList), role, macan, uwongList)
+    }
+    if(role)
+    {
+        if(unplacedUwong > 0)
+        {
+            uwongPossiblePlaced(macan, uwongList).forEach(p => {
+                minimax(ply - 1, !action, !role, macan, [...uwongList, i], unplacedUwong - 1);
+            })
+        }
+        else
+        {
+            uwongList.forEach(u => {
+                uwongPossibleMoves(macan, uwongList, u).forEach(p => {
+                    let uwong = uwongList.filter(i => i != u);
+                    uwong.push(p);
+                    minimax(ply - 1, !action, !role, macan, uwong, unplacedUwong);
+                })
+            })
+        }
+    }
+    else
+    {
+        macanPossibleMoves(macan, uwongList).forEach(p => {
+            minimax(ply - 1, !action, !role, p, uwongList, unplacedUwong);
+        })
+    }
+}
+
+const macanPossibleMoves = (macan, uwongList) => {
+    const possibleMoves = neighbors[macan]
+    let canMoves = []
+    possibleMoves.forEach((p,index) => {
+        let uwongCount = 0
+        let traverse = p
+        while(traverse != null && uwongList.includes(traverse)){
+            uwongCount++
+            traverse = neighbors[traverse][index]
+        }
+        if(traverse && (uwongCount == 0 || uwongCount % 2 == 1))
+            canMoves.push(traverse)
+    });
+    return canMoves
+}
+
+const uwongPossibleMoves = (macan, uwongList, index) => {
+    let canMoves = []
+    neighbors[index].forEach((n) => {
+        if(n && !uwongList.includes(n) && macan != n)
+            canMoves.push(n)
+    });
+    return canMoves
+}
+
+const uwongPossiblePlaced = (macan, uwongList) => {
+    let canPlaced = []
+    for(let i = 0; i < 37; i++)
+    {
+        if(i != macan && !uwongList.includes(i))
+            canPlaced.push(i)
+    }
+    return canPlaced
 }
 
 app.use(express.json());
@@ -167,6 +241,18 @@ app.get('/area',(req,res)=>{
 app.get("/test", async (req, res) => {
     let neighbour = getAvailablePositionFromArray(1)
     return res.status(201).json({ message: "Hello world!",neighbors:neighbour });
+})
+
+app.post('/api/macan/moves',(req,res) => {
+    const {macan, uwong} = req.body
+    const getMoves = macanPossibleMoves(macan, uwong)
+    return res.status(200).json({moves: getMoves})
+})
+
+app.post('/api/uwong/moves',(req,res) => {
+    const {macan, uwong, index} = req.body
+    const getMoves = uwongPossibleMoves(macan, uwong, index)
+    return res.status(200).json({moves: getMoves})
 })
 
 app.listen(3000, () => console.log("Listening on port 3000"));
