@@ -231,6 +231,7 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
             // positions.forEach((p,index)=>{
             //     howSafeToPlaceUwong(p,uwongList,macan)
             // })
+            SBEunit += howSafeToPlaceUwong(positions,uwongList,macan)
         }
     }else{
         // macan
@@ -246,7 +247,7 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
             // const canMakan = getAllPossibleMakan(macan,uwongList)
             // const bestMakan = canMakan.reduce((acc,m)=>{
             //     if(positions.includes(m.index)){
-            //         if(m.total > 0){
+            //         if(m.total > acc){
             //             return m.total
             //         }
             //     }else{
@@ -256,20 +257,33 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
             // SBEunit -= bestMakan*100
             // const allPossibleAncam = positions.map((p)=> neighbors[p])
             // const bestAncam = allPossibleAncam.reduce((acc,a)=>{
-            //     const totalAncam = getBestAncam(a)
+            //     const totalAncam = getBestAncam(a,uwongList)
             //     if(totalAncam > acc){
             //         return totalAncam
             //     }else{
             //         return acc
             //     }
             // },0)
-
+            const canMakan = getAllPossibleMakan(positions,uwongList)
+            const bestMakan = canMakan.reduce((acc,m)=>{
+                if(m.total > acc){
+                    return m.total
+                }else{
+                    return acc
+                }
+            },0)
+            SBEunit -= bestMakan*100
+            const bestAncam = getBestAncam(positions,uwongList)
+            SBEunit -= bestAncam*50
         }
     }
 
     // General Evaluation
-    if(macan != null && uwongList!= null)
-    SBEunit -= (getAvailableAreaForMacan(macan,uwongList,[],0).length*-5)
+    if(macan != null && uwongList!= null){
+        SBEunit -= (getAvailableAreaForMacan(macan,uwongList,[],0).length*-5)
+        if(getAvailableAreaForMacan(macan,uwongList,[],0).length == 0) winCondition = "uwong"
+        
+    }
 
     // Win Condition
     if(winCondition == "macan"){
