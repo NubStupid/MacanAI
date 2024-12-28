@@ -52,9 +52,10 @@ const getAvailablePositionFromArray = (index) => {
 }
 
 const getAvailableAreaForMacan = (macan,uwongList,area,index) => {
-    console.log(area,index);
+    // console.log(area,index);
     if(area.length == 0){   
-        const availablePositions = getAvailablePositionFromArray(macan)
+        let availablePositions = getAvailablePositionFromArray(macan)    
+        availablePositions = availablePositions.filter((p)=>!uwongList.includes(p))
         if(availablePositions.length == 0){
             return []
         }else{
@@ -65,7 +66,7 @@ const getAvailableAreaForMacan = (macan,uwongList,area,index) => {
         if(index != area.length){
             availablePositions = getAvailablePositionFromArray(area[index])
         }
-        console.log(area,index,area.length,availablePositions.length);
+        // console.log(area,index,area.length,availablePositions.length);
         if(availablePositions.length != 0){
             availablePositions.map((p)=>{
                 if(!area.includes(p) && !uwongList.includes(p)){
@@ -87,17 +88,26 @@ const getAllPossibleMakan = (macan,uwongList) => {
     possibleMakan.forEach((p,index) => {
         let uwongCount =0
         let traverse = p
+        let indexIfMacanAte
+        let eaten = []
         while(traverse != null && uwongList.includes(traverse)){
             uwongCount++
+            eaten.push(traverse)
             traverse = neighbors[traverse][index]
+            if(traverse != null) indexIfMacanAte = traverse
+            if(traverse == null && uwongCount % 2 == 1)uwongCount++
         }
         if(uwongCount % 2 == 1){
             canMakan.push({
                 index:p,
-                total:uwongCount
+                eaten:eaten,
+                total:uwongCount,
+                indexToEat: indexIfMacanAte
             })
         }
     });
+    // console.log(canMakan);
+    
     return canMakan
 }
 
@@ -231,7 +241,10 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
             // positions.forEach((p,index)=>{
             //     howSafeToPlaceUwong(p,uwongList,macan)
             // })
-            SBEunit += howSafeToPlaceUwong(positions,uwongList,macan)
+            let howSafe = howSafeToPlaceUwong(positions,uwongList,macan) 
+            SBEunit += howSafe
+            console.log("How Safe to Move/Place:",howSafe);
+            
         }
     }else{
         // macan
@@ -264,24 +277,35 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
             //         return acc
             //     }
             // },0)
-            const canMakan = getAllPossibleMakan(positions,uwongList)
-            const bestMakan = canMakan.reduce((acc,m)=>{
-                if(m.total > acc){
-                    return m.total
-                }else{
-                    return acc
+            const canMakan = getAllPossibleMakan(macan,uwongList)
+            // console.log(canMakan);
+            
+            canMakan.forEach((c)=>{
+                if(c.indexToEat == positions){
+                    console.log("Macan makan ",c.total," orang");
+                    
+                    SBEunit -= c.total*100
                 }
-            },0)
-            SBEunit -= bestMakan*100
-            const bestAncam = getBestAncam(positions,uwongList)
-            SBEunit -= bestAncam*50
+            })
         }
     }
-
+    
     // General Evaluation
     if(macan != null && uwongList!= null){
-        SBEunit -= (getAvailableAreaForMacan(macan,uwongList,[],0).length*-5)
-        if(getAvailableAreaForMacan(macan,uwongList,[],0).length == 0) winCondition = "uwong"
+        let macanSpace
+        if(role != 1)macanSpace = (getAvailableAreaForMacan(macan,uwongList,[],0).length) 
+        else macanSpace = (getAvailableAreaForMacan(macan,[...uwongList,positions],[],0).length) 
+        console.log("Macan's Space: ",macanSpace);
+        
+        SBEunit -= macanSpace * 5
+        if(macanSpace == 0) winCondition = "uwong"
+        // console.log([...uwongList,positions]);
+        
+        let bestAncam
+        if(role == 1) bestAncam = getBestAncam(macan,[...uwongList,positions])
+        else bestAncam = getBestAncam(macan,uwongList)
+        console.log("Best Ancam:",bestAncam);
+        SBEunit -= bestAncam*50
         
     }
 
@@ -372,9 +396,45 @@ const uwongPossiblePlaced = (macan, uwongList) => {
     return canPlaced
 }
 
+/**
+ * 
+ * @param {Number} uwong 
+ * @param {Array<Number>} uwongList 
+ * @returns {Array<Number>}
+ */
+const getUpdatedUwongListIfUwongMoved = (uwong,uwongList) => {
+    let updatedUwongList = uwongList.filter((u)=>u != uwong)
+    return updatedUwongList
+}
+
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+
+app.get('/api/test/sbe',(req,res)=>{
+    // uwong move (success)
+    // let toMove = {
+    //     "index":12,
+    //     "to":18
+    // }
+    // let dummUwongList = [6,7,8,9,10,11,12,13,14,15,24,29,20,17]
+    // let dummMacan = 19
+    // let updatedDummUwongList = getUpdatedUwongListIfUwongMoved(toMove.index,dummUwongList)
+    // console.log(updatedDummUwongList);
+    
+    // const sbe = calculateUnitSBE(toMove.to,1,dummMacan,updatedDummUwongList)
+
+    // macan move 
+
+    let macanMove = 28
+    let macan = 23
+    let dummUwongList = [4,8,13]
+    const sbe = calculateUnitSBE(macanMove,2,macan,dummUwongList)
+    return res.status(200).json({sbe:sbe})
+
+})
+
 
 app.get("/api/uwong/setup",(req,res) => {
     let dummUwongList = [6,7,8,11,12,13,16,17,18]
