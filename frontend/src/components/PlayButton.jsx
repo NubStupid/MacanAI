@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import client from "../client";
 
-function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
+function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage})
 {
     const neighbors = [
         [null, null, null, null, 1, null, null, 3],
@@ -43,6 +43,70 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         [33, null, null, 35, null, null, null, null]
     ]
 
+    const AIMove = async (role) => {
+        let temp = await client.post("/ai/move", {ply: 1, role, macan: macan.current, uwong: uwong.current, unplacedUwong})
+        let data = temp.data.data
+        setTimeout(() => {
+            if(role)
+            {
+                uwong.current = data.uwong; 
+                macan.current = data.macan;
+                setUnplacedUwong(data.unplacedUwong);
+                renderButton();
+                setTimeout(() => {
+                    possibleMoves(arenaButtons[macan.current])
+                    setTurn(i => i + 1);
+                }, 300);
+            }
+            else
+            {
+                let ketemu = false;
+                uwong.current = data.uwong;
+                arenaButtons[data.macan].classList.add("bg-red-200")
+                neighbors[macan.current].forEach((n, idx) => {
+                    if(ketemu)
+                        return;
+                    if(n == data.macan)
+                        ketemu = true;
+                    else if(n && arenaButtons[n].className.includes("bg-blue-300"))
+                        eatUwong(n, idx);
+                })
+                macan.current = data.macan;
+                if(uwong.current.length + data.unplacedUwong < 14)
+                {
+                    gameOver();
+                    return;
+                }
+                setUnplacedUwong(data.unplacedUwong);
+                setTurn(i => i + 1);
+                renderButton();
+            }
+        }, 1000);
+    }
+
+    useEffect(() => {
+        // if(turn == 0)
+        // {
+        //     macan.current = -1;
+        //     uwong.current = [];
+        //     renderButton();
+        //     setTurn(i => 1);
+        //     console.log(turn);
+            
+        // }
+        if(turn % 2 == AI)
+        {
+            // console.log(turn);
+            
+            setMessage("AI's Turn!");
+            turn % 2 ? AIMove(true, macan.current, uwong.current, unplacedUwong) : AIMove(false, macan.current, uwong.current, unplacedUwong);
+        }
+        else
+        {
+            setMessage("Player's Turn!");
+        }
+    }, [turn])
+
     const macan = useRef(-1);
     const uwong = useRef([]);
     let arenaButtons = document.querySelectorAll(".playButton")
@@ -72,22 +136,25 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
     }
 
     const select9Uwong = (btn, hover = true) => {
-        let index = btn.id.substring(3);
-        
+        let index = parseInt(btn.id.substring(3));
         if(index == 12 || index == 14 || index == 22 || index == 24)
         {
             if(hover)
-            {
+            {   
                 arenaButtons[index].classList.add("bg-blue-200")
+                arenaButtons[index].classList.remove("bg-green-300");
                 neighbors[index].forEach((n) => {
                     arenaButtons[n].classList.add("bg-blue-200");
+                    arenaButtons[n].classList.remove("bg-green-300");
                 })
             }
             else
             {
                 arenaButtons[index].classList.remove("bg-blue-200")
+                arenaButtons[index].classList.add("bg-green-300")
                 neighbors[index].forEach((n) => {
                     arenaButtons[n].classList.remove("bg-blue-200");
+                    arenaButtons[n].classList.add("bg-green-300")
                 })
             }
         }
@@ -104,6 +171,15 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
                 arenaButtons[neighbors[neighbors[index][6]][3]].classList.add("bg-blue-200");
                 arenaButtons[neighbors[index][6]].classList.add("bg-blue-200");
                 arenaButtons[neighbors[neighbors[index][6]][4]].classList.add("bg-blue-200");
+                arenaButtons[neighbors[neighbors[index][1]][3]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[index][1]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[index][3]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][1]][4]].classList.remove("bg-green-300");
+                arenaButtons[index].classList.remove("bg-green-300")
+                arenaButtons[neighbors[index][4]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][6]][3]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[index][6]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][6]][4]].classList.remove("bg-green-300");
             }
             else
             {
@@ -116,6 +192,15 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
                 arenaButtons[neighbors[neighbors[index][6]][3]].classList.remove("bg-blue-200");
                 arenaButtons[neighbors[index][6]].classList.remove("bg-blue-200");
                 arenaButtons[neighbors[neighbors[index][6]][4]].classList.remove("bg-blue-200");
+                arenaButtons[neighbors[neighbors[index][1]][3]].classList.add("bg-green-300");
+                arenaButtons[neighbors[index][1]].classList.add("bg-green-300");
+                arenaButtons[neighbors[index][3]].classList.add("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][1]][4]].classList.add("bg-green-300");
+                arenaButtons[index].classList.add("bg-green-300")
+                arenaButtons[neighbors[index][4]].classList.add("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][6]][3]].classList.add("bg-green-300");
+                arenaButtons[neighbors[index][6]].classList.add("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][6]][4]].classList.add("bg-green-300");
             }
         }
     }
@@ -164,6 +249,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
             return false;
         else if(arenaButtons[now].className.includes("bg-red-200"))
             return true;
+        console.log(arenaButtons[now].className);
         if(eatUwong(neighbors[now][idx], idx) == true)
         {
             uwong.current = uwong.current.filter(u => u != now);
@@ -177,6 +263,8 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         if(turn == 1)
         {
             let selectedButtons = document.querySelectorAll(".bg-blue-200");
+            // console.log(selectedButtons);
+            
             selectedButtons.forEach((b) => uwong.current.push(parseInt(b.id.substring(3))))
             renderButton();
             setUnplacedUwong(unplacedUwong - 9);
@@ -238,6 +326,9 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
     }
 
     const hover = (btn) => {
+        if(arenaButtons.length == 0)
+            arenaButtons = document.querySelectorAll(".playButton")
+        
         let index = parseInt(btn.id.substring(3));
         if(turn == 1 && ((index > 11 && index < 15) || (index > 16 && index < 20) || (index > 21 && index < 25)))
             select9Uwong(btn)
@@ -285,6 +376,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
             if(!btn.disabled)
             {
                 btn.classList.remove("bg-red-100");
+                btn.classList.remove("bg-green-300");
                 btn.classList.add("bg-red-200");
             }
         }
@@ -312,6 +404,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong})
         else if(turn % 2 == 0 && btn.className.includes("bg-red-200"))
         {
             btn.classList.remove("bg-red-200");
+            btn.classList.add("bg-green-300");
             btn.classList.add("bg-red-100");
         }
     }

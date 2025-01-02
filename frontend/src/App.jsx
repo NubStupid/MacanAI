@@ -8,7 +8,7 @@ function App() {
   return (
     <>
       {routes == "Menu" && <Menu setRoutes={setRoutes} />}
-      {routes == "Play" && <Play />}
+      {routes == "Play" && <Play setRoutes={setRoutes} />}
     </>
   )
 }
