@@ -3,6 +3,9 @@ import client from "../client";
 
 function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage})
 {
+    let arenaButtons = document.querySelectorAll(".playButton")
+    const macan = useRef(-1);
+    const uwong = useRef([]);
     const neighbors = [
         [null, null, null, null, 1, null, null, 3],
         [null, null, null, 0, 2, null, 4, null],
@@ -44,74 +47,77 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
     ]
 
     const AIMove = async (role) => {
-        let temp = await client.post("/ai/move", {ply: 1, role, macan: macan.current, uwong: uwong.current, unplacedUwong})
-        let data = temp.data.data
-        setTimeout(() => {
-            if(role)
-            {
-                uwong.current = data.uwong; 
-                macan.current = data.macan;
-                setUnplacedUwong(data.unplacedUwong);
-                renderButton();
-                setTimeout(() => {
-                    possibleMoves(arenaButtons[macan.current])
-                    setTurn(i => i + 1);
-                }, 300);
-            }
-            else
-            {
-                let ketemu = false;
-                uwong.current = data.uwong;
-                arenaButtons[data.macan].classList.add("bg-red-200")
-                neighbors[macan.current].forEach((n, idx) => {
-                    if(ketemu)
-                        return;
-                    if(n == data.macan)
-                        ketemu = true;
-                    else if(n && arenaButtons[n].className.includes("bg-blue-300"))
-                        eatUwong(n, idx);
-                })
-                macan.current = data.macan;
-                if(uwong.current.length + data.unplacedUwong < 14)
+        // Setup turn
+        if(turn < 3)
+        {
+            let temp = await client.post("/ai/setup", {role, uwong: uwong.current})
+            let data = temp.data
+            setTimeout(() => {
+                if(role)
                 {
-                    gameOver();
-                    return;
+                    uwong.current = data.uwong; 
+                    setUnplacedUwong(12);
+                    setTurn(2);
                 }
-                setUnplacedUwong(data.unplacedUwong);
-                setTurn(i => i + 1);
+                else
+                {
+                    macan.current = data.macan;
+                    setTurn(i => i + 1);
+                }
                 renderButton();
-            }
-        }, 1000);
+            }, 1000);
+        }
+        // Playing turn
+        else
+        {
+            let temp = await client.post("/ai/move", {ply: 1, role, macan: macan.current, uwong: uwong.current, unplacedUwong})
+            let data = temp.data.data
+            setTimeout(async () => {
+                if(role)
+                {
+                    uwong.current = data.uwong; 
+                    macan.current = data.macan;
+                    setUnplacedUwong(data.unplacedUwong);
+                    renderButton();
+                    setTimeout(() => {
+                        possibleMoves(arenaButtons[macan.current])
+                    }, 300);
+                }
+                else
+                {
+                    uwong.current = data.uwong;
+                    if(!neighbors[macan.current].includes(data.macan))
+                    {
+                        let temp = await client.post("/macan/eat", {macan: macan.current, uwong: uwong.current, pos: data.macan});
+                        uwong.current = temp.data.eat;
+                    }
+                    macan.current = data.macan;
+                    if(uwong.current.length + data.unplacedUwong < 14)
+                    {
+                        gameOver();
+                        return;
+                    }
+                    setUnplacedUwong(data.unplacedUwong);
+                    renderButton();
+                }
+                setTurn(i => i + 1);
+            }, 1000);
+        }
     }
 
     useEffect(() => {
-        // if(turn == 0)
-        // {
-        //     macan.current = -1;
-        //     uwong.current = [];
-        //     renderButton();
-        //     setTurn(i => 1);
-        //     console.log(turn);
-            
-        // }
         if(turn % 2 == AI)
         {
-            // console.log(turn);
-            
             setMessage("AI's Turn!");
             turn % 2 ? AIMove(true, macan.current, uwong.current, unplacedUwong) : AIMove(false, macan.current, uwong.current, unplacedUwong);
         }
         else
-        {
             setMessage("Player's Turn!");
-        }
     }, [turn])
 
-    const macan = useRef(-1);
-    const uwong = useRef([]);
-    let arenaButtons = document.querySelectorAll(".playButton")
-
     const renderButton = () => {
+        if(arenaButtons.length == 0)
+            arenaButtons = document.querySelectorAll(".playButton")
         arenaButtons.forEach(b => {
             b.classList.remove("border-black");
             b.classList.remove("border-2");
@@ -244,27 +250,11 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         }
     }
 
-    const eatUwong = (now, idx) => {
-        if(!now)
-            return false;
-        else if(arenaButtons[now].className.includes("bg-red-200"))
-            return true;
-        console.log(arenaButtons[now].className);
-        if(eatUwong(neighbors[now][idx], idx) == true)
-        {
-            uwong.current = uwong.current.filter(u => u != now);
-            return true;
-        }
-        return false;
-    }
-
-    const click = (btn) => {
+    const click = async (btn) => {
         let index = parseInt(btn.id.substring(3));
         if(turn == 1)
         {
             let selectedButtons = document.querySelectorAll(".bg-blue-200");
-            // console.log(selectedButtons);
-            
             selectedButtons.forEach((b) => uwong.current.push(parseInt(b.id.substring(3))))
             renderButton();
             setUnplacedUwong(unplacedUwong - 9);
@@ -272,18 +262,15 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         }
         else if(turn == 2)
         {
-            if(btn.className.includes("bg-red-200"))
-            {   
-                macan.current = parseInt(btn.id.substring(3));
-                renderButton();
-                setTurn(i => i + 1);
-            }
+            macan.current = index;
+            renderButton();
+            setTurn(i => i + 1);
         }
         else if(turn % 2)
         {
             if(unplacedUwong > 0)
             {
-                uwong.current.push(parseInt(btn.id.substring(3)));
+                uwong.current.push(index);
                 renderButton();
                 setUnplacedUwong(unplacedUwong - 1);
                 setTurn(turn + 1);
@@ -305,16 +292,12 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         }
         else if(turn % 2 == 0)
         {
-            let ketemu = false;
-            neighbors[macan.current].forEach((n, idx) => {
-                if(ketemu)
-                    return;
-                if(arenaButtons[n] == btn)
-                    ketemu = true;
-                else if(arenaButtons[n] && arenaButtons[n].className.includes("bg-blue-300"))
-                    eatUwong(n, idx);
-            })
-            macan.current = parseInt(btn.id.substring(3));
+            if(!neighbors[macan.current].includes(index))
+            {
+                let temp = await client.post("/macan/eat", {macan: macan.current, uwong: uwong.current, pos: index});
+                uwong.current = temp.data.eat;
+            }
+            macan.current = index;
             if(uwong.current.length + unplacedUwong < 14)
             {
                 gameOver();
@@ -339,6 +322,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             if(!uwong.current.includes(index))
             {
                 btn.classList.add("bg-red-200");
+                btn.classList.remove("bg-green-300");
                 btn.disabled = false;
             }
         }
@@ -350,6 +334,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 {
                     btn.disabled = false;
                     btn.classList.add("bg-blue-200");
+                    btn.classList.remove("bg-green-300");
                 }
                 else
                     btn.disabled = true;
@@ -364,6 +349,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 else if(btn.className.includes("bg-blue-100"))
                 {
                     btn.disabled = false;
+                    btn.classList.remove("bg-green-300");
                     btn.classList.remove("bg-blue-100");
                     btn.classList.add("bg-blue-200");
                 }
@@ -386,7 +372,10 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         if(turn == 1)
             select9Uwong(btn, false)
         else if(turn == 2 && btn.className.includes("bg-red-200"))
+        {
             btn.classList.remove("bg-red-200");
+            btn.classList.add("bg-green-300");
+        }
         else if(turn == 2 && btn.className.includes("bg-green-300") && !btn.disabled)
         {
             btn.classList.remove("bg-green-300");
@@ -399,6 +388,8 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 btn.classList.remove("bg-blue-200");
                 if(unplacedUwong == 0 && !btn.className.includes("bg-blue-300"))
                     btn.classList.add("bg-blue-100");
+                else if(!btn.className.includes("bg-blue-300"))
+                    btn.classList.add("bg-green-300");
             }
         }
         else if(turn % 2 == 0 && btn.className.includes("bg-red-200"))

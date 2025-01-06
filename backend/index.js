@@ -162,6 +162,54 @@ const bestSetupPhaseMacanEatUwong = (uwongList) =>{
     return uwongToEat
 }
 
+// Meletakkan macan di tempat yang possible makan dan movesnya paling banyak
+// Menghindari posisi di segitiga ujung kiri kanan karena memungkinkan lebih cepat terkepung
+const bestSetupMacan = (uwongList) => {
+    let pos, min = 1000000;
+    for(let i = 0; i < 37; i++)
+    {
+        if(!uwongList.includes(i))
+        {
+            let temp = 0;
+            const canMakan = getAllPossibleMakan(i, uwongList)
+            canMakan.forEach((c)=>{
+                temp -= c.total*100;
+            })
+            const moves = macanPossibleMoves(i, uwongList);
+            temp -= moves.length * 20;
+            if(i < 6 || i > 30)
+                temp += 100;
+            if(temp < min)
+            {
+                min = temp;
+                pos = i;
+            }
+            else if(temp == min)
+            {
+                if(Array.isArray(pos))
+                    pos.push(i);
+                else
+                    pos = [pos, i];
+            }
+        }
+    }
+    // Kalau ada lebih dari 1 kemungkinan tempat yang nilainya sama maka dipilih acak
+    if(Array.isArray(pos))
+    {
+        let len = pos.length;
+        let index = parseInt(Math.random() * (len - 1));
+        return pos[index];
+    }
+    return pos;
+}
+
+const bestSetupUwong = () => {
+    // uwong akan selalu mencari tempat yang paling tertutup
+    let index = [12, 14, 22, 24]
+    let center = index[parseInt(Math.random() * 3)];
+    return [...neighbors[center], center];
+}
+
 // Masang uwong yang tempatnya lebih tertutup
 /**
  * @param {Array<number>} possibleUwongList - Array of uwong that "could" be placed for the setup phase
@@ -285,6 +333,10 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
                     console.log("Macan makan ",c.total," orang");
                     
                     SBEunit -= c.total*100
+                    // const moves = macanPossibleMoves(positions, uwongList);
+                    // SBEunit -= (moves.length - 1) * 20;
+                    // if(positions < 6 || positions > 30)
+                    //     SBEunit += 100;
                 }
             })
         }
@@ -321,8 +373,14 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
 }
 
 const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
-    // role true = uwong, false = macan
-    // action false = min, true = max
+    // role true = uwong(max), false = macan(min)
+
+    if(uwongList.length + unplacedUwong < 14)
+        return 100000;
+
+    if(macanPossibleMoves(macan, uwongList).length == 0)
+        return -100000;
+
     let SBE = 1000000
     if(role)
         SBE = -1000000;
@@ -333,15 +391,13 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
         
         if(role)
         {
-            // let updatedDummUwongList = getUpdatedUwongListIfUwongMoved(toMove.index,dummUwongList)
-            // calculateUnitSBE(toMove.to,1,dummMacan,updatedDummUwongList)
+            // SBE = calculateUnitSBE(p, 1, macan, uwongList)
             if(unplacedUwong == 0)
             {
                 uwongList.forEach((u, idx) => {
                     updatedUwongList = getUpdatedUwongListIfUwongMoved(u ,uwongList)
                     uwongPossibleMoves(macan, uwongList, idx).forEach(p => {
                         let temp = calculateUnitSBE(p, 1, macan, updatedUwongList);
-                        // console.log(updatedUwongList, p, temp);
                         role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
                     })
                 });
@@ -350,21 +406,15 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
             {
                 uwongPossiblePlaced(macan, uwongList).forEach(p => {
                     let temp = calculateUnitSBE(p, 1, macan, uwongList)
-                    // console.log(uwongList, p, temp);
                     role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
                 })
             }
         }
         else
         {
-            // console.log(macan, uwongList);
-            
-            // console.log(macanPossibleMoves(macan, uwongList));
-            
+            // SBE = calculateUnitSBE(p, 2, macan, uwongList)
             macanPossibleMoves(macan, uwongList).forEach(p => {
                 let temp = calculateUnitSBE(p, 2, macan, uwongList)
-                // console.log(macan, p, temp);
-                
                 role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
             })
         }
@@ -384,6 +434,7 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
                     macanPos = macan;
                     uwongPos = [...uwongList, p];
                     sisaUwong = unplacedUwong - 1;
+                    SBE = temp;
                 }
             })
         }
@@ -400,6 +451,7 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
                         macanPos = macan;
                         uwongPos = uwong;
                         sisaUwong = unplacedUwong;
+                        SBE = temp;
                     }
                 })
             })
@@ -424,14 +476,7 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
     return SBE;
 }
 
-const macanPossibleMoves = (macan, uwongList) => {
-    // if(macan == -1)
-    // {
-    //     for()
-    // }
-    console.log("macan " + macan);
-    console.log(uwongList);
-    
+const macanPossibleMoves = (macan, uwongList) => {    
     const possibleMoves = neighbors[macan]
     let canMoves = []
     possibleMoves.forEach((p,index) => {
@@ -441,24 +486,26 @@ const macanPossibleMoves = (macan, uwongList) => {
             uwongCount++
             traverse = neighbors[traverse][index]
         }
-        if(traverse && (uwongCount == 0 || uwongCount % 2 == 1))
+        
+        if(traverse != null && (uwongCount == 0 || uwongCount % 2 == 1))
             canMoves.push(traverse)
     });
     return canMoves
 }
 
-// const eatUwong = (now, pos, idx, uwong) => {
-//     if(!now)
-//         return false;
-//     else if(now ==)
-//         return true;
-//     if(eatUwong(neighbors[now][idx], idx) == true)
-//     {
-//         uwong.current = uwong.current.filter(u => u != now);
-//         return true;
-//     }
-//     return false;
-// }
+const eatUwong = (now, pos, idx, uwong) => {
+    if(!now)
+        return {status: false, uwong};
+    else if(now == pos)
+        return {status: true, uwong};
+    let temp = eatUwong(neighbors[now][idx], pos, idx, uwong);
+    if(temp.status)
+    {
+        let uwongList = temp.uwong.filter(u => u != now);
+        return {status: true, uwong: uwongList};
+    }
+    return {status: false, uwong};
+}
 
 const uwongPossibleMoves = (macan, uwongList, index) => {
     let canMoves = []
@@ -518,7 +565,6 @@ app.get('/api/test/sbe',(req,res)=>{
 
 })
 
-
 app.get("/api/uwong/setup",(req,res) => {
     let dummUwongList = [6,7,8,11,12,13,16,17,18]
     let totalArea = bestSetup9UwongPlaced(dummUwongList)
@@ -551,6 +597,20 @@ app.post('/api/macan/moves',(req,res) => {
     return res.status(200).json({moves: getMoves})
 })
 
+app.post('/api/macan/eat',(req,res) => {
+    const {macan, uwong, pos} = req.body
+    let eat = null;
+    neighbors[macan].forEach((p, idx) => {
+        if(p && !eat && uwong.includes(p))
+        {
+            let temp = eatUwong(macan, pos, idx, uwong);
+            if(temp.status)
+                eat = temp.uwong;
+        }
+    })
+    return res.status(200).json({eat: eat})
+})
+
 app.post('/api/uwong/moves',(req,res) => {
     const {macan, uwong, index} = req.body
     const getMoves = uwongPossibleMoves(macan, uwong, index)
@@ -561,6 +621,17 @@ app.post('/api/ai/move',(req,res) => {
     const {ply, role, macan, uwong, unplacedUwong} = req.body
     const sbe = minimax(ply, role, macan, uwong, unplacedUwong, 0)
     return res.status(200).json({data: sbe})
+})
+
+app.post("/api/ai/setup",(req,res) => {
+    const {role, uwong} = req.body
+    if(role)
+    {
+        let uwong = bestSetupUwong();
+        return res.json({uwong})
+    }
+    let macan = bestSetupMacan(uwong);
+    return res.json({macan})
 })
 
 
