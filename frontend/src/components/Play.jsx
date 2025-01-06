@@ -6,6 +6,7 @@ function Play({setRoutes})
 {
     const [turn, setTurn] = useState(1);
     const [AI, setAI] = useState(-1);
+    const [ply, setPly] = useState(-1);
     const [unplacedUwong, setUnplacedUwong] = useState(21);
     const [message, setMessage] = useState("");
 
@@ -17,12 +18,19 @@ function Play({setRoutes})
     return(
         <>
             {AI == -1 &&
-            <div className="text-center mt-80">
+            <div className="text-center mt-72">
                 <h3 className="text-5xl font-bold mb-10">Choose your role</h3>
                 <button className="bg-blue-200 p-3 px-5 rounded-lg hover:bg-blue-300 text-xl font-semibold me-5" onClick={() => setAI(0)}>Uwong</button>
                 <button className="bg-red-200 p-3 px-5 rounded-lg hover:bg-red-300 text-xl font-semibold" onClick={() => setAI(1)}>Macan</button>
             </div>}
-            {AI != -1 && 
+            {AI != -1 && ply == -1 && 
+            <div className="text-center mt-72">
+                <h3 className="text-5xl font-bold mb-10">Choose your level</h3>
+                <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold me-5" onClick={() => setPly(1)}>Easy</button>
+                <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold me-5" onClick={() => setPly(2)}>Medium</button>
+                <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold" onClick={() => setPly(3)}>hard</button>
+            </div>}
+            {AI != -1 && ply != -1 &&
             <>
                 <div className="fixed left-0 w-80 h-full bg-gray-100 py-10 px-6 font-semibold text-xl">
                     <div className="font-bold text-3xl mb-7">MacananAI</div>
@@ -49,7 +57,7 @@ function Play({setRoutes})
                 </div>
                 <div id="arena" className="fixed top-52 left-96 ">
                     <Arena />
-                    <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} />
+                    <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} ply={ply} />
                 </div>
             </>}
         </>

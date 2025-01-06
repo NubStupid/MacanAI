@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import client from "../client";
 
-function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage})
+function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage, ply})
 {
     let arenaButtons = document.querySelectorAll(".playButton")
     const macan = useRef(-1);
@@ -69,8 +69,8 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         }
         // Playing turn
         else
-        {
-            let temp = await client.post("/ai/move", {ply: 1, role, macan: macan.current, uwong: uwong.current, unplacedUwong})
+        {            
+            let temp = await client.post("/ai/move", {ply, role, macan: macan.current, uwong: uwong.current, unplacedUwong})
             let data = temp.data.data
             setTimeout(async () => {
                 if(role)

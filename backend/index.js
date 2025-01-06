@@ -372,7 +372,7 @@ function calculateUnitSBE(positions,role,macan,uwongList,setup = false){
 
 }
 
-const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
+const minimax = (ply, role, macan, uwongList, unplacedUwong, now, alpha = -1000000, beta = 10000000) => {
     // role true = uwong(max), false = macan(min)
 
     if(uwongList.length + unplacedUwong < 14)
@@ -395,18 +395,26 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
             if(unplacedUwong == 0)
             {
                 uwongList.forEach((u, idx) => {
+                    if(beta <= alpha)
+                        return SBE;
                     updatedUwongList = getUpdatedUwongListIfUwongMoved(u ,uwongList)
                     uwongPossibleMoves(macan, uwongList, idx).forEach(p => {
+                        if(beta <= alpha)
+                            return SBE;
                         let temp = calculateUnitSBE(p, 1, macan, updatedUwongList);
-                        role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
+                        SBE = Math.max(SBE, temp)
+                        alpha = Math.max(alpha, SBE);
                     })
                 });
             }
             else
             {
                 uwongPossiblePlaced(macan, uwongList).forEach(p => {
+                    if(beta <= alpha)
+                        return SBE;
                     let temp = calculateUnitSBE(p, 1, macan, uwongList)
-                    role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
+                    SBE = Math.max(SBE, temp)
+                    alpha = Math.max(alpha, SBE);
                 })
             }
         }
@@ -414,8 +422,11 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
         {
             // SBE = calculateUnitSBE(p, 2, macan, uwongList)
             macanPossibleMoves(macan, uwongList).forEach(p => {
+                if(beta <= alpha)
+                    return SBE;
                 let temp = calculateUnitSBE(p, 2, macan, uwongList)
-                role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
+                SBE = Math.min(SBE, temp)
+                beta = Math.min(beta, SBE);
             })
         }
         console.log(SBE);
@@ -427,31 +438,39 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
         if(unplacedUwong > 0)
         {
             uwongPossiblePlaced(macan, uwongList).forEach(p => {
-                let temp = minimax(ply - 1, !role, macan, [...uwongList, p], unplacedUwong - 1, now + 1);
+                if(beta <= alpha)
+                    return SBE;
+                let temp = minimax(ply - 1, !role, macan, [...uwongList, p], unplacedUwong - 1, now + 1, alpha, beta);
                 // role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
-                if((role && temp > SBE) || (!role && temp < SBE))
+                if(temp > SBE)
                 {
                     macanPos = macan;
                     uwongPos = [...uwongList, p];
                     sisaUwong = unplacedUwong - 1;
                     SBE = temp;
+                    alpha = Math.max(alpha, SBE);
                 }
             })
         }
         else
         {
             uwongList.forEach(u => {
+                if(beta <= alpha)
+                    return SBE;
                 uwongPossibleMoves(macan, uwongList, u).forEach(p => {
+                    if(beta <= alpha)
+                        return SBE;
                     let uwong = uwongList.filter(i => i != u);
                     uwong.push(p);
-                    let temp = minimax(ply - 1, !role, macan, uwong, unplacedUwong, now + 1);
+                    let temp = minimax(ply - 1, !role, macan, uwong, unplacedUwong, now + 1, alpha, beta);
                     // role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
-                    if((role && temp > SBE) || (!role && temp < SBE))
+                    if(temp > SBE)
                     {
                         macanPos = macan;
                         uwongPos = uwong;
                         sisaUwong = unplacedUwong;
                         SBE = temp;
+                        alpha = Math.max(alpha, SBE);
                     }
                 })
             })
@@ -461,13 +480,17 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now) => {
     else
     {
         macanPossibleMoves(macan, uwongList).forEach(p => {
-            let temp = minimax(ply - 1, !role, p, uwongList, unplacedUwong, now + 1);
+            if(beta <= alpha)
+                return SBE;
+            let temp = minimax(ply - 1, !role, p, uwongList, unplacedUwong, now + 1, alpha, beta);
             // role ? SBE = Math.max(SBE, temp) : SBE = Math.min(SBE, temp)
-            if((role && temp > SBE) || (!role && temp < SBE))
+            if(temp < SBE)
             {
                 macanPos = p;
                 uwongPos = uwongList;
                 sisaUwong = unplacedUwong;
+                SBE = temp;
+                beta = Math.min(beta, SBE);
             }
         })
     }
