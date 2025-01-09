@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import client from "../client";
 
-function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage, ply})
+function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage, ply, setUwongLives})
 {
     let arenaButtons = document.querySelectorAll(".playButton")
     const macan = useRef(-1);
@@ -92,6 +92,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                         uwong.current = temp.data.eat;
                     }
                     macan.current = data.macan;
+                    setUwongLives(uwong.current.length+data.unplacedUwong - 14);
                     if(uwong.current.length + data.unplacedUwong < 14)
                     {
                         gameOver();
@@ -127,16 +128,16 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             b.classList.remove("bg-red-300");
             b.classList.remove("bg-red-200");
             b.classList.remove("bg-red-100");
-            b.classList.add("bg-green-300");
+            b.classList.add("bg-green-500");
             b.disabled = true;
         });
         if(macan.current != -1)
         {
-            arenaButtons[macan.current].classList.remove("bg-green-300");
+            arenaButtons[macan.current].classList.remove("bg-green-500");
             arenaButtons[macan.current].classList.add("bg-red-300");
         }
         uwong.current.forEach(u => {
-            arenaButtons[u].classList.remove("bg-green-300");
+            arenaButtons[u].classList.remove("bg-green-500");
             arenaButtons[u].classList.add("bg-blue-300")
         });
     }
@@ -148,19 +149,19 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             if(hover)
             {   
                 arenaButtons[index].classList.add("bg-blue-200")
-                arenaButtons[index].classList.remove("bg-green-300");
+                arenaButtons[index].classList.remove("bg-green-500");
                 neighbors[index].forEach((n) => {
                     arenaButtons[n].classList.add("bg-blue-200");
-                    arenaButtons[n].classList.remove("bg-green-300");
+                    arenaButtons[n].classList.remove("bg-green-500");
                 })
             }
             else
             {
                 arenaButtons[index].classList.remove("bg-blue-200")
-                arenaButtons[index].classList.add("bg-green-300")
+                arenaButtons[index].classList.add("bg-green-500")
                 neighbors[index].forEach((n) => {
                     arenaButtons[n].classList.remove("bg-blue-200");
-                    arenaButtons[n].classList.add("bg-green-300")
+                    arenaButtons[n].classList.add("bg-green-500")
                 })
             }
         }
@@ -177,15 +178,15 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 arenaButtons[neighbors[neighbors[index][6]][3]].classList.add("bg-blue-200");
                 arenaButtons[neighbors[index][6]].classList.add("bg-blue-200");
                 arenaButtons[neighbors[neighbors[index][6]][4]].classList.add("bg-blue-200");
-                arenaButtons[neighbors[neighbors[index][1]][3]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[index][1]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[index][3]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][1]][4]].classList.remove("bg-green-300");
-                arenaButtons[index].classList.remove("bg-green-300")
-                arenaButtons[neighbors[index][4]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][6]][3]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[index][6]].classList.remove("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][6]][4]].classList.remove("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][1]][3]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[index][1]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[index][3]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][1]][4]].classList.remove("bg-green-500");
+                arenaButtons[index].classList.remove("bg-green-500")
+                arenaButtons[neighbors[index][4]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][6]][3]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[index][6]].classList.remove("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][6]][4]].classList.remove("bg-green-500");
             }
             else
             {
@@ -198,15 +199,15 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 arenaButtons[neighbors[neighbors[index][6]][3]].classList.remove("bg-blue-200");
                 arenaButtons[neighbors[index][6]].classList.remove("bg-blue-200");
                 arenaButtons[neighbors[neighbors[index][6]][4]].classList.remove("bg-blue-200");
-                arenaButtons[neighbors[neighbors[index][1]][3]].classList.add("bg-green-300");
-                arenaButtons[neighbors[index][1]].classList.add("bg-green-300");
-                arenaButtons[neighbors[index][3]].classList.add("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][1]][4]].classList.add("bg-green-300");
-                arenaButtons[index].classList.add("bg-green-300")
-                arenaButtons[neighbors[index][4]].classList.add("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][6]][3]].classList.add("bg-green-300");
-                arenaButtons[neighbors[index][6]].classList.add("bg-green-300");
-                arenaButtons[neighbors[neighbors[index][6]][4]].classList.add("bg-green-300");
+                arenaButtons[neighbors[neighbors[index][1]][3]].classList.add("bg-green-500");
+                arenaButtons[neighbors[index][1]].classList.add("bg-green-500");
+                arenaButtons[neighbors[index][3]].classList.add("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][1]][4]].classList.add("bg-green-500");
+                arenaButtons[index].classList.add("bg-green-500")
+                arenaButtons[neighbors[index][4]].classList.add("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][6]][3]].classList.add("bg-green-500");
+                arenaButtons[neighbors[index][6]].classList.add("bg-green-500");
+                arenaButtons[neighbors[neighbors[index][6]][4]].classList.add("bg-green-500");
             }
         }
     }
@@ -215,7 +216,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         arenaButtons.forEach((b) => {
             b.classList.remove("border-black");
             b.classList.remove("border-2");
-            b.classList.remove("bg-green-300");
+            b.classList.remove("bg-green-500");
             b.classList.remove("bg-blue-300");
             b.classList.remove("bg-blue-200");
             b.classList.remove("bg-blue-100");
@@ -298,6 +299,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 uwong.current = temp.data.eat;
             }
             macan.current = index;
+            setUwongLives(uwong.current.length+unplacedUwong - 14);
             if(uwong.current.length + unplacedUwong < 14)
             {
                 gameOver();
@@ -322,7 +324,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             if(!uwong.current.includes(index))
             {
                 btn.classList.add("bg-red-200");
-                btn.classList.remove("bg-green-300");
+                btn.classList.remove("bg-green-500");
                 btn.disabled = false;
             }
         }
@@ -330,11 +332,11 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         {
             if(unplacedUwong > 0)
             {
-                if(btn.className.includes("bg-green-300"))
+                if(btn.className.includes("bg-green-500"))
                 {
                     btn.disabled = false;
                     btn.classList.add("bg-blue-200");
-                    btn.classList.remove("bg-green-300");
+                    btn.classList.remove("bg-green-500");
                 }
                 else
                     btn.disabled = true;
@@ -349,7 +351,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 else if(btn.className.includes("bg-blue-100"))
                 {
                     btn.disabled = false;
-                    btn.classList.remove("bg-green-300");
+                    btn.classList.remove("bg-green-500");
                     btn.classList.remove("bg-blue-100");
                     btn.classList.add("bg-blue-200");
                 }
@@ -362,7 +364,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             if(!btn.disabled)
             {
                 btn.classList.remove("bg-red-100");
-                btn.classList.remove("bg-green-300");
+                btn.classList.remove("bg-green-500");
                 btn.classList.add("bg-red-200");
             }
         }
@@ -374,11 +376,11 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
         else if(turn == 2 && btn.className.includes("bg-red-200"))
         {
             btn.classList.remove("bg-red-200");
-            btn.classList.add("bg-green-300");
+            btn.classList.add("bg-green-500");
         }
-        else if(turn == 2 && btn.className.includes("bg-green-300") && !btn.disabled)
+        else if(turn == 2 && btn.className.includes("bg-green-500") && !btn.disabled)
         {
-            btn.classList.remove("bg-green-300");
+            btn.classList.remove("bg-green-500");
             btn.classList.add("bg-blue-300");
         }
         else if(turn % 2)
@@ -389,92 +391,92 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 if(unplacedUwong == 0 && !btn.className.includes("bg-blue-300"))
                     btn.classList.add("bg-blue-100");
                 else if(!btn.className.includes("bg-blue-300"))
-                    btn.classList.add("bg-green-300");
+                    btn.classList.add("bg-green-500");
             }
         }
         else if(turn % 2 == 0 && btn.className.includes("bg-red-200"))
         {
             btn.classList.remove("bg-red-200");
-            btn.classList.add("bg-green-300");
+            btn.classList.add("bg-green-500");
             btn.classList.add("bg-red-100");
         }
     }
     return(
         <>
             <button id="btn0" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[-30px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[10px] left-[-30px] playButton"></button>
             <button id="btn1" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[-30px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[-30px] playButton"></button>
             <button id="btn2" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[-30px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[330px] left-[-30px] playButton"></button>
             <button id="btn3" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[50px]  playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[81px] left-[50px]  playButton"></button>
             <button id="btn4" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[50px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[50px] playButton"></button>
             <button id="btn5" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[50px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[259px] left-[50px] playButton"></button>
             <button id="btn6" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[150px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[-30px] left-[150px] playButton"></button>
             <button id="btn7" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[150px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[70px] left-[150px] playButton"></button>
             <button id="btn8" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[150px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[150px] playButton"></button>
             <button id="btn9" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[150px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[270px] left-[150px] playButton"></button>
             <button id="btn10" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[150px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[370px] left-[150px] playButton"></button>
             <button id="btn11" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[250px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[-30px] left-[250px] playButton"></button>
             <button id="btn12" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[250px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[70px] left-[250px] playButton"></button>
             <button id="btn13" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[250px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[250px] playButton"></button>
             <button id="btn14" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[250px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[270px] left-[250px] playButton"></button>
             <button id="btn15" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[250px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[370px] left-[250px] playButton"></button>
             <button id="btn16" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[350px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[-30px] left-[350px] playButton"></button>
             <button id="btn17" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[350px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[70px] left-[350px] playButton"></button>
             <button id="btn18" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[350px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[350px] playButton"></button>
             <button id="btn19" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[350px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[270px] left-[350px] playButton"></button>
             <button id="btn20" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[350px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[370px] left-[350px] playButton"></button>
             <button id="btn21" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[450px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[-30px] left-[450px] playButton"></button>
             <button id="btn22" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[450px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[70px] left-[450px] playButton"></button>
             <button id="btn23" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[450px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[450px] playButton"></button>
             <button id="btn24" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[450px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[270px] left-[450px] playButton"></button>
             <button id="btn25" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[450px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[370px] left-[450px] playButton"></button>
             <button id="btn26" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[-30px] left-[550px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[-30px] left-[550px] playButton"></button>
             <button id="btn27" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[70px] left-[550px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[70px] left-[550px] playButton"></button>
             <button id="btn28" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[550px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[550px] playButton"></button>
             <button id="btn29" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[270px] left-[550px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[270px] left-[550px] playButton"></button>
             <button id="btn30" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[370px] left-[550px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[370px] left-[550px] playButton"></button>
             <button id="btn31" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[81px] left-[650px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[81px] left-[650px] playButton"></button>
             <button id="btn32" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[650px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[650px] playButton"></button>
             <button id="btn33" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[259px] left-[650px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[259px] left-[650px] playButton"></button>
             <button id="btn34" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[10px] left-[730px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[10px] left-[730px] playButton"></button>
             <button id="btn35" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[170px] left-[730px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[170px] left-[730px] playButton"></button>
             <button id="btn36" onMouseEnter={(e) => hover(e.target)} onMouseLeave={(e) => unhover(e.target)} onClick={(e) => click(e.target)}
-                className="z-0 absolute rounded-full bg-green-300 w-[60px] h-[60px] top-[330px] left-[730px] playButton"></button>
+                className="z-0 absolute rounded-full bg-green-500 w-[60px] h-[60px] top-[330px] left-[730px] playButton"></button>
         </>
     )
 }

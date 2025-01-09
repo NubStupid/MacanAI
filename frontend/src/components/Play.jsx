@@ -9,6 +9,7 @@ function Play({setRoutes})
     const [ply, setPly] = useState(-1);
     const [unplacedUwong, setUnplacedUwong] = useState(21);
     const [message, setMessage] = useState("");
+    const [uwongLives, setUwongLives] = useState(7);
 
     // useEffect(() => {
     //     setTurn(1);
@@ -28,14 +29,30 @@ function Play({setRoutes})
                 <h3 className="text-5xl font-bold mb-10">Choose your level</h3>
                 <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold me-5" onClick={() => setPly(1)}>Easy</button>
                 <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold me-5" onClick={() => setPly(2)}>Medium</button>
-                <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold" onClick={() => setPly(3)}>hard</button>
+                <button className="bg-green-200 p-3 px-5 rounded-lg hover:bg-green-300 text-xl font-semibold" onClick={() => setPly(3)}>Hard</button>
             </div>}
             {AI != -1 && ply != -1 &&
             <>
                 <div className="fixed left-0 w-80 h-full bg-gray-100 py-10 px-6 font-semibold text-xl">
-                    <div className="font-bold text-3xl mb-7">MacananAI</div>
+                    <div className="font-bold text-3xl mb-7 text-center">🐯MacananAI🐯</div>
                     <div className="grid gap-4 text-center">
                         <div className="bg-green-300 p-5 rounded-lg">{message}</div>
+                        <div className="my-1 p-3 bg-violet-300 border-2 rounded-lg grid grid-cols-3">
+                            <div className="text-center">
+                                Uwong<br />
+                                Lives
+                            </div>
+                            <div className="col-span-2 text-center my-auto py-2 ms-1 rounded-lg bg-pink-200">
+                                {
+                                    uwongLives == 1 ? (
+                                        "❤️‍🩹"
+                                    ) : uwongLives > 1 && uwongLives <= 3 ? (
+                                        "❤️‍🔥"
+                                    ) : "❤️"
+                                }
+                                {uwongLives}
+                            </div>
+                        </div>
                         <div className="flex w-full">
                             <div className="bg-blue-300 p-3 rounded-lg me-3 w-full" style={turn % 2 ? {boxShadow: "0px 0px 15px rgb(255, 238, 0)"} : {}}>
                                 <div>Uwong</div>
@@ -57,7 +74,7 @@ function Play({setRoutes})
                 </div>
                 <div id="arena" className="fixed top-52 left-96 ">
                     <Arena />
-                    <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} ply={ply} />
+                    <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} ply={ply} setUwongLives={setUwongLives} />
                 </div>
             </>}
         </>

@@ -376,10 +376,10 @@ const minimax = (ply, role, macan, uwongList, unplacedUwong, now, alpha = -10000
     // role true = uwong(max), false = macan(min)
 
     if(uwongList.length + unplacedUwong < 14)
-        return 100000;
+        return -100000;
 
     if(macanPossibleMoves(macan, uwongList).length == 0)
-        return -100000;
+        return 100000;
 
     let SBE = 1000000
     if(role)
