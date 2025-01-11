@@ -92,7 +92,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                         uwong.current = temp.data.eat;
                     }
                     macan.current = data.macan;
-                    setUwongLives(uwong.current.length+data.unplacedUwong - 14);
+                    setUwongLives(uwong.current.length+data.unplacedUwong - 13);
                     if(uwong.current.length + data.unplacedUwong < 14)
                     {
                         gameOver();
@@ -299,7 +299,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 uwong.current = temp.data.eat;
             }
             macan.current = index;
-            setUwongLives(uwong.current.length+unplacedUwong - 14);
+            setUwongLives(uwong.current.length+unplacedUwong - 13);
             if(uwong.current.length + unplacedUwong < 14)
             {
                 gameOver();
