@@ -40,9 +40,13 @@ function Play({setRoutes})
             {gameOver ? (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-70 flex flex-col justify-center items-center text-white">
                     <h1 className="text-6xl font-bold mb-10">
-                        {winner === "player" 
+                        {
+                            AI === 0 && winner === "player" 
                             ? "You Win! 🎉" 
-                            : "Game Over! AI Wins! 🐯"}
+                            : AI === 1 && winner === "macan"
+                            ? "You Win! 🎉"
+                            : "Game Over! AI Wins!"
+                        }
                     </h1>
                     <div className="flex space-x-5">
                         <button className="bg-green-500 p-5 rounded-lg text-2xl hover:bg-green-600" onClick={restartGame}>
