@@ -10,7 +10,7 @@ function Play({setRoutes})
     const [unplacedUwong, setUnplacedUwong] = useState(21);
     const [message, setMessage] = useState("");
     const [uwongLives, setUwongLives] = useState(8);
-    const [gameOver, setGameOver] = useState(false); 
+    const [gameOver, setGameOver] = useState(false);
     const [winner, setWinner] = useState(null);
 
     // Fungsi restart permainan
@@ -28,7 +28,7 @@ function Play({setRoutes})
     useEffect(() => {
         if (uwongLives <= 0) {
             setGameOver(true);
-            setWinner(AI === 1 ? "AI" : "player"); 
+            setWinner(AI === 1 ? "player" : "AI");
         } else if (uwongLives >= 14) {
             setGameOver(true);
             setWinner(AI === 0 ? "AI" : "player"); 
@@ -43,7 +43,7 @@ function Play({setRoutes})
                         {
                             AI === 0 && winner === "player" 
                             ? "You Win! 🎉" 
-                            : AI === 1 && winner === "macan"
+                            : AI === 1 && winner === "player"
                             ? "You Win! 🎉"
                             : "Game Over! AI Wins!"
                         }
@@ -110,7 +110,7 @@ function Play({setRoutes})
                         </div>
                         <div id="arena" className="fixed top-52 left-96 ">
                             <Arena />
-                            <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} ply={ply} setUwongLives={setUwongLives} />
+                            <PlayButton turn={turn} setTurn={setTurn} unplacedUwong={unplacedUwong} setUnplacedUwong={setUnplacedUwong} AI={AI} setMessage={setMessage} ply={ply} setUwongLives={setUwongLives} setGameOver={setGameOver}/>
                         </div>
                     </>}
                 </>

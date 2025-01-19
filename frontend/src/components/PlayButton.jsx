@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import client from "../client";
 
-function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage, ply, setUwongLives})
+function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMessage, ply, setUwongLives, setGameOver})
 {
     let arenaButtons = document.querySelectorAll(".playButton")
     const macan = useRef(-1);
@@ -95,7 +95,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                     setUwongLives(uwong.current.length+data.unplacedUwong - 13);
                     if(uwong.current.length + data.unplacedUwong < 14)
                     {
-                        gameOver();
+                        setGameOver(true)
                         return;
                     }
                     setUnplacedUwong(data.unplacedUwong);
@@ -237,7 +237,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
                 arenaButtons[m].disabled = false;
             })
             if(moves.data.moves.length == 0)
-                gameOver();
+                setGameOver(true)
         }
         else
         {
@@ -302,7 +302,7 @@ function PlayButton({turn, setTurn, unplacedUwong, setUnplacedUwong, AI, setMess
             setUwongLives(uwong.current.length+unplacedUwong - 13);
             if(uwong.current.length + unplacedUwong < 14)
             {
-                gameOver();
+                setGameOver(true)
                 return;
             }
             renderButton();
