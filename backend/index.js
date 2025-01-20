@@ -367,7 +367,7 @@ function calculateUnitSBE(
 
         SBEunit -= macanSpace * 5;
         if (macanSpace == 0) winCondition = "uwong";
-        if (unplacedUwong + uwongList <= 14) winCondition = "macan";
+        if (unplacedUwong.length + uwongList <= 14) winCondition = "macan";
 
         // console.log([...uwongList,positions]);
 
